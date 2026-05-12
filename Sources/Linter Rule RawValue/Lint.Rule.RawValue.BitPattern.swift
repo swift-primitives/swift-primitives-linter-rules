@@ -46,8 +46,7 @@ extension Lint.Rule {
     )
 }
 
-@usableFromInline
-internal let bitpatternRawvalueChainMessage: Swift.String =
+fileprivate let bitpatternRawvalueChainMessage: Swift.String =
     "[bitpattern rawvalue chain] [CONV-016]: `init(bitPattern:)` whose argument chains "
     + "through `.rawValue` — including `Int(...)`, `UInt(...)`, `Int.init(...)`, "
     + "`self.init(...)`, and other syntactic equivalents — bypasses the canonical "
@@ -95,7 +94,7 @@ internal final class RawValueBitPatternVisitor: SyntaxVisitor {
         return .visitChildren
     }
 
-    static func containsRawValueAccess(_ expr: ExprSyntax) -> Swift.Bool {
+    private static func containsRawValueAccess(_ expr: ExprSyntax) -> Swift.Bool {
         let finder = RawValueBitPatternFinder(viewMode: .sourceAccurate)
         finder.walk(expr)
         return finder.match != nil

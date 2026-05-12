@@ -46,8 +46,7 @@ extension Lint.Rule {
     )
 }
 
-@usableFromInline
-internal let chainedRawvalueAccessMessage: Swift.String =
+fileprivate let chainedRawvalueAccessMessage: Swift.String =
     "[chained rawvalue access] [CONV-016]: chaining `.rawValue.method()` (or "
     + "paren-wrapped `(x.rawValue).method()`, which is semantically identical) escapes "
     + "the typed system. Prefer `.retag()` (Tier 1) / `.map()` (Tier 2) / `Type.min(a, b)` "
@@ -94,7 +93,7 @@ internal final class RawValueChainVisitor: SyntaxVisitor {
         return .visitChildren
     }
 
-    static func peelParens(_ expr: ExprSyntax) -> ExprSyntax {
+    private static func peelParens(_ expr: ExprSyntax) -> ExprSyntax {
         var current = expr
         while let tuple = current.as(TupleExprSyntax.self),
               tuple.elements.count == 1,

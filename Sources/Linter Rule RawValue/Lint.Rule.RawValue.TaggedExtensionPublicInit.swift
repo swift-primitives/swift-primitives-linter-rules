@@ -44,8 +44,7 @@ extension Lint.Rule {
     )
 }
 
-@usableFromInline
-internal let taggedExtensionPublicInitMessage: Swift.String =
+fileprivate let taggedExtensionPublicInitMessage: Swift.String =
     "[tagged extension public init] [PATTERN-019]: extensions on `Tagged` "
     + "MUST NOT provide `public init` — bypasses the brand's bounded invariants. "
     + "Callers reaching through an extension init never cross the validation gate "
@@ -80,8 +79,7 @@ internal let taggedExtensionPublicInitMessage: Swift.String =
 /// citation is indefensible at review time.
 ///
 /// Skill home: swift-institute/Skills/rule-exemptions/SKILL.md.
-@usableFromInline
-internal let taggedExtensionPublicInitProtocolWitnessCitations: [Swift.String: Swift.String] = [
+fileprivate let taggedExtensionPublicInitProtocolWitnessCitations: [Swift.String: Swift.String] = [
     "ExpressibleByIntegerLiteral":                 "Swift.ExpressibleByIntegerLiteral — init(integerLiteral:) protocol witness",
     "ExpressibleByFloatLiteral":                   "Swift.ExpressibleByFloatLiteral — init(floatLiteral:) protocol witness",
     "ExpressibleByUnicodeScalarLiteral":           "Swift.ExpressibleByUnicodeScalarLiteral — init(unicodeScalarLiteral:) protocol witness",
