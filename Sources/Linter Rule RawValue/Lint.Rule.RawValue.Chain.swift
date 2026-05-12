@@ -77,15 +77,15 @@ internal final class RawValueChainVisitor: SyntaxVisitor {
     let severity: Diagnostic.Severity
     let converter: SourceLocationConverter
     /// See package-scoped admission notes on
-    /// `Lint.Rule.\`chained rawvalue access\``.
-    let brandTypes: Swift.Set<Swift.String>
+    /// ``Lint/Rule/chained rawvalue access``.
+    let brandTypes: Swift.Set<Lint.Brand>
     var matches: [Diagnostic.Record] = []
 
     init(
         source: Source.File,
         severity: Diagnostic.Severity,
         converter: SourceLocationConverter,
-        brandTypes: Swift.Set<Swift.String> = []
+        brandTypes: Swift.Set<Lint.Brand> = []
     ) {
         self.source = source
         self.severity = severity
@@ -140,11 +140,11 @@ internal final class RawValueChainVisitor: SyntaxVisitor {
 /// strict-superset.
 internal func rawValueChainIsAdmitted(
     rawValueAccess: MemberAccessExprSyntax,
-    brandTypes: Swift.Set<Swift.String>
+    brandTypes: Swift.Set<Lint.Brand>
 ) -> Swift.Bool {
     guard !brandTypes.isEmpty else { return false }
     if let baseName = rawValueChainExtractTypeName(base: rawValueAccess.base) {
-        return brandTypes.contains(baseName)
+        return brandTypes.contains(Lint.Brand(baseName))
     }
     return true
 }

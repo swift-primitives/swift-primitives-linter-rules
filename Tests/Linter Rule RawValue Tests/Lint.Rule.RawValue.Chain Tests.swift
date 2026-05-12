@@ -39,7 +39,7 @@ extension Lint.Rule.`chained rawvalue access Tests` {
     static func findings(
         in source: Swift.String,
         file: Swift.String = "test.swift",
-        brandTypes: Set<Swift.String>
+        brandTypes: Set<Lint.Brand>
     ) -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file, brandTypes: brandTypes)
         return Lint.Rule.`chained rawvalue access`.findings(parsed, .warning)

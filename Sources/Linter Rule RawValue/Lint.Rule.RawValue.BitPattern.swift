@@ -77,15 +77,15 @@ internal final class RawValueBitPatternVisitor: SyntaxVisitor {
     let severity: Diagnostic.Severity
     let converter: SourceLocationConverter
     /// See package-scoped admission notes on
-    /// `Lint.Rule.\`bitpattern rawvalue chain\``.
-    let brandTypes: Swift.Set<Swift.String>
+    /// ``Lint/Rule/bitpattern rawvalue chain``.
+    let brandTypes: Swift.Set<Lint.Brand>
     var matches: [Diagnostic.Record] = []
 
     init(
         source: Source.File,
         severity: Diagnostic.Severity,
         converter: SourceLocationConverter,
-        brandTypes: Swift.Set<Swift.String> = []
+        brandTypes: Swift.Set<Lint.Brand> = []
     ) {
         self.source = source
         self.severity = severity
@@ -144,11 +144,11 @@ internal final class RawValueBitPatternFinder: SyntaxVisitor {
 /// is a variable / chain and `brandTypes` is non-empty.
 internal func rawValueBitPatternIsAdmitted(
     rawValueAccess: MemberAccessExprSyntax,
-    brandTypes: Swift.Set<Swift.String>
+    brandTypes: Swift.Set<Lint.Brand>
 ) -> Swift.Bool {
     guard !brandTypes.isEmpty else { return false }
     if let baseName = rawValueChainExtractTypeName(base: rawValueAccess.base) {
-        return brandTypes.contains(baseName)
+        return brandTypes.contains(Lint.Brand(baseName))
     }
     return true
 }
