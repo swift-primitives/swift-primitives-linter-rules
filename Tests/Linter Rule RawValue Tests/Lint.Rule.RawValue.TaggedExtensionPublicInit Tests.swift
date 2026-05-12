@@ -136,4 +136,78 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
+
+    // Exemption shape: [RULE-EXEMPT-2] (protocol-witness-citation-dict).
+    // Extensions on `Tagged` that conform to a stdlib literal protocol
+    // are exempt — the protocol's `init(...)` requirement IS the
+    // validation gate; the conformer cannot drop the public init and
+    // still satisfy the contract. The dict pairs each witness key with
+    // its specific protocol.
+
+    @Test
+    func `extension on Tagged conforming to ExpressibleByIntegerLiteral is exempt per RULE-EXEMPT-2`() {
+        let source = """
+        extension Tagged: ExpressibleByIntegerLiteral {
+            public init(integerLiteral value: Int) { fatalError() }
+        }
+        """
+        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        #expect(findings.isEmpty)
+    }
+
+    @Test
+    func `extension on Tagged conforming to Decodable is exempt per RULE-EXEMPT-2`() {
+        let source = """
+        extension Tagged: Decodable {
+            public init(from decoder: any Decoder) throws { fatalError() }
+        }
+        """
+        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        #expect(findings.isEmpty)
+    }
+
+    @Test
+    func `extension on Tagged conforming to RawRepresentable is exempt per RULE-EXEMPT-2`() {
+        let source = """
+        extension Tagged: RawRepresentable {
+            public init?(rawValue: String) { fatalError() }
+        }
+        """
+        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        #expect(findings.isEmpty)
+    }
+
+    // Exemption shape: [RULE-EXEMPT-5] (Protocol-sentinel) composed
+    // with [RULE-EXEMPT-2]. The `` `Protocol` `` key in the dict
+    // encodes the institute hoisted-protocol pattern per [API-IMPL-009]
+    // / [PKG-NAME-001]: `extension Tagged: Carrier.\`Protocol\`` —
+    // the conformer satisfies the nested-namespace protocol witness
+    // and inherits its init contract. The backtick-escaped form is
+    // load-bearing: bare `Carrier.Protocol` parses as a
+    // `MetatypeTypeSyntax` (Swift's `.Protocol` metatype keyword),
+    // so the institute pattern always uses the escaped spelling.
+    // Inheritance-leaf walking captures the trailing identifier as
+    // `` `Protocol` ``, which matches the dict entry.
+
+    @Test
+    func `extension on Tagged conforming to backtick-escaped Protocol sentinel is exempt per RULE-EXEMPT-5`() {
+        let source = """
+        extension Tagged: Carrier.`Protocol` {
+            public init(value: Int) { fatalError() }
+        }
+        """
+        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        #expect(findings.isEmpty)
+    }
+
+    @Test
+    func `extension on Tagged conforming to non-witness protocol is still flagged`() {
+        let source = """
+        extension Tagged: CustomStringConvertible {
+            public init(_ s: String) { fatalError() }
+        }
+        """
+        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        #expect(findings.count == 1)
+    }
 }

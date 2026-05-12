@@ -60,9 +60,26 @@ internal let taggedExtensionPublicInitMessage: Swift.String =
 /// these inits from the brand-bypass rule when declared inside an
 /// extension conforming to the named protocol.
 ///
+/// Implements [RULE-EXEMPT-2] (protocol-witness-citation-dict): the
+/// dict is the citation surface — each entry pairs a witness name
+/// with the specific protocol whose contract dictates it. Composes
+/// with [RULE-EXEMPT-5] (Protocol-sentinel) via the `"Protocol"` and
+/// `` "`Protocol`" `` entries, which exempt the institute hoisted-
+/// protocol pattern ([API-IMPL-009] / [PKG-NAME-001]) — extensions
+/// conforming to a nested `Carrier.\`Protocol\`` /
+/// `Ordering.\`Protocol\`` witness alias. The backtick-escaped form
+/// is load-bearing: bare `Carrier.Protocol` parses as
+/// `MetatypeTypeSyntax` (Swift's `.Protocol` metatype keyword) and is
+/// not captured by the inheritance-leaf walker; the institute idiom
+/// always uses the escaped spelling. The bare `"Protocol"` dict entry
+/// is retained for defense-in-depth against future SwiftSyntax
+/// behavior changes.
+///
 /// Citation discipline: each entry names the specific protocol whose
 /// init contract justifies the exemption. Adding an entry without a
 /// citation is indefensible at review time.
+///
+/// Skill home: swift-institute/Skills/rule-exemptions/SKILL.md.
 @usableFromInline
 internal let taggedExtensionPublicInitProtocolWitnessCitations: [Swift.String: Swift.String] = [
     "ExpressibleByIntegerLiteral":                 "Swift.ExpressibleByIntegerLiteral — init(integerLiteral:) protocol witness",
@@ -142,10 +159,15 @@ internal final class RawValueTaggedExtensionPublicInitVisitor: SyntaxVisitor {
         guard extendsTagged(node.extendedType) else {
             return .visitChildren
         }
-        // Stdlib-protocol-witness exemption: if the extension declares
-        // conformance to a protocol whose init contract requires the
-        // public init, the protocol IS the validation gate. Skip the
-        // entire extension's init checks in that case.
+        // Exempt per [RULE-EXEMPT-2] (protocol-witness-citation-dict):
+        // if the extension declares conformance to a protocol whose
+        // init contract requires the public init, the protocol IS the
+        // validation gate. Skip the entire extension's init checks in
+        // that case. Composes with [RULE-EXEMPT-5] (Protocol-sentinel)
+        // via the `"Protocol"` / `` "`Protocol`" `` dict entries,
+        // covering the institute hoisted-protocol pattern
+        // ([API-IMPL-009] / [PKG-NAME-001]). Skill home:
+        // swift-institute/Skills/rule-exemptions/SKILL.md.
         let conformingProtocols = inheritanceLeafNames(node.inheritanceClause)
         let isProtocolWitnessExtension = conformingProtocols.contains { proto in
             taggedExtensionPublicInitProtocolWitnessCitations[proto] != nil
