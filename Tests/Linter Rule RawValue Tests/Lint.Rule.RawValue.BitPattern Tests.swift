@@ -23,12 +23,25 @@ extension Lint.Rule {
         @Suite struct `Edge Case` {}
         @Suite struct Evasion {}
         @Suite struct Negative {}
+        @Suite struct `Package Scope` {}
     }
 }
 
 extension Lint.Rule.`bitpattern rawvalue chain Tests` {
     static func findings(in source: Swift.String, file: Swift.String = "test.swift") -> [Diagnostic.Record] {
         let parsed = Lint.Source.parsed(from: source, file: file)
+        return Lint.Rule.`bitpattern rawvalue chain`.findings(parsed, .warning)
+    }
+
+    /// Run with a simulated owning-package brand-types set. See
+    /// package-scoped admission notes on
+    /// `Lint.Rule.\`bitpattern rawvalue chain\``.
+    static func findings(
+        in source: Swift.String,
+        file: Swift.String = "test.swift",
+        brandTypes: Set<Swift.String>
+    ) -> [Diagnostic.Record] {
+        let parsed = Lint.Source.parsed(from: source, file: file, brandTypes: brandTypes)
         return Lint.Rule.`bitpattern rawvalue chain`.findings(parsed, .warning)
     }
 }
@@ -181,5 +194,55 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.`Edge Case` {
         if findings.count == 1 {
             #expect(findings[0].severity == .error)
         }
+    }
+}
+
+// MARK: - Package-scoped admission (numerics rule-recognizer, 2026-05-12)
+//
+// `Int.init(bitPattern: Brand)` lives in one file per brand per
+// package — see [IMPL-010]. The matrix below mirrors PATTERN-017.
+
+extension Lint.Rule.`bitpattern rawvalue chain Tests`.`Package Scope` {
+    @Test
+    func `same-package bitPattern with matching brand-type is admitted (direct base)`() {
+        // `Int(bitPattern: Cardinal.rawValue)` inside the brand's
+        // own integration overload file: legitimate.
+        let source = "let i = Int(bitPattern: Cardinal.rawValue)"
+        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(
+            in: source,
+            brandTypes: ["Cardinal"]
+        )
+        #expect(findings.isEmpty)
+    }
+
+    @Test
+    func `same-package bitPattern with variable base is admitted (package-scope fallback)`() {
+        // `Int(bitPattern: position.rawValue)` — the actual shape in
+        // `Int+Ordinal.swift` etc.
+        let source = "let i = Int(bitPattern: position.rawValue)"
+        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(
+            in: source,
+            brandTypes: ["Ordinal"]
+        )
+        #expect(findings.isEmpty)
+    }
+
+    @Test
+    func `cross-package bitPattern fires when brand-type list mismatches`() {
+        // `Int(bitPattern: Cardinal.rawValue)` but the package
+        // declares ["Foo"]: still fires.
+        let source = "let i = Int(bitPattern: Cardinal.rawValue)"
+        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(
+            in: source,
+            brandTypes: ["Foo"]
+        )
+        #expect(findings.count == 1)
+    }
+
+    @Test
+    func `no brand-types declared - bitPattern fires as today (back-compat)`() {
+        let source = "let i = Int(bitPattern: x.rawValue)"
+        let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(in: source)
+        #expect(findings.count == 1)
     }
 }
