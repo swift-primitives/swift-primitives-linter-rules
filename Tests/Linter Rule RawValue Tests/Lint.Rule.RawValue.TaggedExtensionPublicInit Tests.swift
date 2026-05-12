@@ -210,4 +210,62 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
+
+    @Test
+    func `free-generic-Tag domain extension with Underlying binding is admitted`() {
+        let source = """
+        extension Tagged where Underlying == Cardinal, Tag: ~Copyable {
+            public init(_ uint: UInt) { fatalError() }
+            public init(_ int: Int) throws(Cardinal.Error) { fatalError() }
+        }
+        """
+        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        // Free generic Tag has no specific owner at which a per-tag
+        // validation gate could live. The Underlying binding (==
+        // Cardinal) signals "domain extension on Underlying axis",
+        // which the institute uses for typed bridges between
+        // numerics-domain primitives. Tag-specific invariants are out
+        // of scope by construction.
+        #expect(findings.isEmpty)
+    }
+
+    @Test
+    func `free-generic-Tag domain extension with Underlying binding (single init) is admitted`() {
+        let source = """
+        extension Tagged where Underlying == Cardinal, Tag: ~Copyable {
+            public init(_ index: Tagged<Tag, Ordinal>) { fatalError() }
+        }
+        """
+        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        #expect(findings.isEmpty)
+    }
+
+    @Test
+    func `extension binding both Underlying and Tag is still flagged (Tag bound)`() {
+        let source = """
+        extension Tagged where Underlying == Cardinal, Tag == MySpecificTag {
+            public init(_ raw: Cardinal) { fatalError() }
+        }
+        """
+        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        // Tag is bound to a concrete (MySpecificTag) so a per-tag
+        // validation gate IS expressible here — the rule's intent
+        // applies and the init should still fire.
+        #expect(findings.count == 1)
+    }
+
+    @Test
+    func `bare extension on Tagged with no where clause is still flagged`() {
+        let source = """
+        extension Tagged {
+            public init(raw: RawValue) { fatalError() }
+        }
+        """
+        let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
+        // No Underlying binding signals no domain intent. Both axes
+        // are free generically, but the absence of Underlying ==
+        // signals this is not a deliberate domain bridge — the rule
+        // should still fire to surface the bypass.
+        #expect(findings.count == 1)
+    }
 }

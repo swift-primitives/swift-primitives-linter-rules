@@ -155,6 +155,32 @@ internal final class RawValueTaggedExtensionPublicInitVisitor: SyntaxVisitor {
         return names
     }
 
+    /// Returns true when the where clause binds `Underlying` to a
+    /// concrete type via `SameTypeRequirementSyntax` AND does NOT bind
+    /// `Tag` to a concrete type via the same. The first condition signals
+    /// "this extension is a domain extension on the Underlying axis";
+    /// the second signals "Tag is free / generic / constrained but not
+    /// bound." Together they identify the free-generic-Tag domain
+    /// extension shape where the per-Tag validation gate is structurally
+    /// inexpressible.
+    private func isFreeGenericTagDomainExtension(_ clause: GenericWhereClauseSyntax?) -> Swift.Bool {
+        guard let clause else { return false }
+        var bindsUnderlying = false
+        var bindsTag = false
+        for requirement in clause.requirements {
+            guard let sameType = requirement.requirement.as(SameTypeRequirementSyntax.self) else {
+                continue
+            }
+            let lhs = sameType.leftType.trimmedDescription
+            if lhs == "Underlying" {
+                bindsUnderlying = true
+            } else if lhs == "Tag" {
+                bindsTag = true
+            }
+        }
+        return bindsUnderlying && !bindsTag
+    }
+
     override func visit(_ node: ExtensionDeclSyntax) -> SyntaxVisitorContinueKind {
         guard extendsTagged(node.extendedType) else {
             return .visitChildren
@@ -173,6 +199,20 @@ internal final class RawValueTaggedExtensionPublicInitVisitor: SyntaxVisitor {
             taggedExtensionPublicInitProtocolWitnessCitations[proto] != nil
         }
         if isProtocolWitnessExtension {
+            return .visitChildren
+        }
+        // Free-generic-Tag domain extension admit: when the extension
+        // binds `Underlying` to a concrete type but leaves `Tag` free
+        // (no `where Tag == <concrete>` requirement), there is no
+        // specific tag owner at which the validation gate could live.
+        // The institute pattern uses this shape for typed bridges
+        // between numerics-domain primitives (Cardinal ↔ Ordinal ↔
+        // Vector etc.); the construction does pass through the
+        // underlying type's own typed factory (`Cardinal.init(_:)`,
+        // `Ordinal.init(_:)`), which IS the validation gate for the
+        // Underlying axis — tag-specific invariants are out of scope
+        // because Tag is free by construction.
+        if isFreeGenericTagDomainExtension(node.genericWhereClause) {
             return .visitChildren
         }
         for member in node.memberBlock.members {
