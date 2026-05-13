@@ -33,7 +33,7 @@ internal import SwiftSyntax
 extension Lint.Rule {
     public static let `bitpattern rawvalue chain` = Lint.Rule(
         id: "bitpattern rawvalue chain",
-        defaultSeverity: .warning,
+        default: .warning,
         findings: { source, severity in
             let visitor = RawValueBitPatternVisitor(
                 source: source.file,

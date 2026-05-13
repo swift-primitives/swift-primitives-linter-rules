@@ -31,7 +31,7 @@ internal import SwiftSyntax
 extension Lint.Rule {
     public static let `tagged extension public init` = Lint.Rule(
         id: "tagged extension public init",
-        defaultSeverity: .warning,
+        default: .warning,
         findings: { source, severity in
             let visitor = RawValueTaggedExtensionPublicInitVisitor(
                 source: source.file,

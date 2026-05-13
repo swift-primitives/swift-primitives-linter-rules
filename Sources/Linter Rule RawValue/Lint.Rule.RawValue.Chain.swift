@@ -33,7 +33,7 @@ internal import SwiftSyntax
 extension Lint.Rule {
     public static let `chained rawvalue access` = Lint.Rule(
         id: "chained rawvalue access",
-        defaultSeverity: .warning,
+        default: .warning,
         findings: { source, severity in
             let visitor = RawValueChainVisitor(
                 source: source.file,
