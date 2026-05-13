@@ -100,14 +100,3 @@ internal final class RawValueBitPatternVisitor: SyntaxVisitor {
         return finder.match != nil
     }
 }
-
-internal final class RawValueBitPatternFinder: SyntaxVisitor {
-    var match: MemberAccessExprSyntax? = nil
-
-    override func visit(_ node: MemberAccessExprSyntax) -> SyntaxVisitorContinueKind {
-        if node.declName.baseName.text == "rawValue", match == nil {
-            match = node
-        }
-        return .visitChildren
-    }
-}
