@@ -10,7 +10,8 @@
 // ===----------------------------------------------------------------------===//
 
 public import Linter_Primitives
-public import Linter_Rule_RawValue
+public import Primitives_Linter_Rule_Cardinal
+public import Primitives_Linter_Rule_RawValue
 public import Linter_Institute_Rules
 
 /// Primitives-tier rule bundle.
@@ -33,6 +34,9 @@ public import Linter_Institute_Rules
 extension Lint.Rule.Bundle {
     public static let primitives: [Lint.Rule.Configuration] =
         Lint.Rule.Bundle.institute + [
+            // Cardinal pack (Wave 3 2026-05-15)
+            .enable(.`zero or one literal`),
+            .enable(.`count minus one`),
             // RawValue pack
             .enable(.`bitpattern rawvalue chain`),
             .enable(.`chained rawvalue access`),

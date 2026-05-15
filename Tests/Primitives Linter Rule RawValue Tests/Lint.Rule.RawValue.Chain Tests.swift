@@ -14,7 +14,7 @@ import SwiftSyntax
 import SwiftParser
 import Linter_Primitives
 import Linter_Rules_Test_Support
-@testable import Linter_Rule_RawValue
+@testable import Primitives_Linter_Rule_RawValue
 
 extension Lint.Rule {
     @Suite

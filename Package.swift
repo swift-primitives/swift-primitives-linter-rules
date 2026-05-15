@@ -20,8 +20,14 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "Linter Rule RawValue",
-            targets: ["Linter Rule RawValue"]
+            name: "Primitives Linter Rule RawValue",
+            targets: ["Primitives Linter Rule RawValue"]
+        ),
+        // Wave 3 (2026-05-15) — relocated from swift-linter-rules per
+        // three-tier-linter-rules-partition.md.
+        .library(
+            name: "Primitives Linter Rule Cardinal",
+            targets: ["Primitives Linter Rule Cardinal"]
         ),
 
         // Aggregate bundle — publishes `Lint.Rule.Bundle.primitives`
@@ -40,24 +46,41 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Linter Rule RawValue",
+            name: "Primitives Linter Rule RawValue",
             dependencies: [
                 .product(name: "Linter Primitives", package: "swift-linter-primitives"),
                 .product(name: "SwiftSyntax", package: "swift-syntax"),
             ]
         ),
         .target(
+            name: "Primitives Linter Rule Cardinal",
+            dependencies: [
+                .product(name: "Linter Primitives", package: "swift-linter-primitives"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftOperators", package: "swift-syntax"),
+            ]
+        ),
+        .target(
             name: "Linter Primitives Rules",
             dependencies: [
                 .product(name: "Linter Primitives", package: "swift-linter-primitives"),
-                "Linter Rule RawValue",
+                "Primitives Linter Rule RawValue",
+                "Primitives Linter Rule Cardinal",
                 .product(name: "Linter Institute Rules", package: "swift-institute-linter-rules"),
             ]
         ),
         .testTarget(
-            name: "Linter Rule RawValue Tests",
+            name: "Primitives Linter Rule RawValue Tests",
             dependencies: [
-                "Linter Rule RawValue",
+                "Primitives Linter Rule RawValue",
+                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
+            ]
+        ),
+        .testTarget(
+            name: "Primitives Linter Rule Cardinal Tests",
+            dependencies: [
+                "Primitives Linter Rule Cardinal",
                 .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
                 .product(name: "SwiftParser", package: "swift-syntax"),
             ]
