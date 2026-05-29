@@ -39,7 +39,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(path: "../swift-linter-primitives"),
+        .package(url: "https://github.com/swift-primitives/swift-linter-primitives.git", branch: "main"),
         .package(path: "../../swift-foundations/swift-institute-linter-rules"),
         .package(path: "../../swift-foundations/swift-linter-rules"),
         .package(url: "https://github.com/swiftlang/swift-syntax.git", "602.0.0"..<"603.0.0"),
