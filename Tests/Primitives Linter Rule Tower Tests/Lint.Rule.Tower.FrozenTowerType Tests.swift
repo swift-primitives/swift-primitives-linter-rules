@@ -65,7 +65,7 @@ extension Lint.Rule.`frozen tower type Tests`.Unit {
     @Test
     func `deep member-type extension roots at the outermost tower namespace`() {
         let findings = Lint.Rule.`frozen tower type Tests`.findings(in: """
-            extension Tree.N.Bounded {
+            extension Tree.N.Nested {
                 public struct Header {
                     var highWater: Int
                 }
