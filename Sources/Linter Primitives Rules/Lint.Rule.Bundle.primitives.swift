@@ -37,6 +37,7 @@ extension Lint.Rule.Bundle {
         Lint.Rule.Bundle.institute + [
             // Tower pack (Round M ζ pilot 2026-06-12)
             .enable(.`frozen tower type`),
+            .enable(.`clone-less box`),
             // Cardinal pack (Wave 3 2026-05-15)
             .enable(.`zero or one literal`),
             .enable(.`count minus one`),
