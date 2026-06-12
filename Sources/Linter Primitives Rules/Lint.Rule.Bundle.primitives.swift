@@ -12,6 +12,7 @@
 public import Linter_Primitives
 public import Primitives_Linter_Rule_Cardinal
 public import Primitives_Linter_Rule_RawValue
+public import Primitives_Linter_Rule_Tower
 public import Linter_Institute_Rules
 
 /// Primitives-tier rule bundle.
@@ -34,6 +35,8 @@ public import Linter_Institute_Rules
 extension Lint.Rule.Bundle {
     public static let primitives: [Lint.Rule.Configuration] =
         Lint.Rule.Bundle.institute + [
+            // Tower pack (Round M ζ pilot 2026-06-12)
+            .enable(.`frozen tower type`),
             // Cardinal pack (Wave 3 2026-05-15)
             .enable(.`zero or one literal`),
             .enable(.`count minus one`),

@@ -29,6 +29,11 @@ let package = Package(
             name: "Primitives Linter Rule Cardinal",
             targets: ["Primitives Linter Rule Cardinal"]
         ),
+        // Round M ζ pilot (2026-06-12) — tower-scoped structural rules.
+        .library(
+            name: "Primitives Linter Rule Tower",
+            targets: ["Primitives Linter Rule Tower"]
+        ),
 
         // Aggregate bundle — publishes `Lint.Rule.Bundle.primitives`
         // (= institute + primitives-tier rules). Primitives-tier
@@ -61,11 +66,19 @@ let package = Package(
             ]
         ),
         .target(
+            name: "Primitives Linter Rule Tower",
+            dependencies: [
+                .product(name: "Linter Primitives", package: "swift-linter-primitives"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+            ]
+        ),
+        .target(
             name: "Linter Primitives Rules",
             dependencies: [
                 .product(name: "Linter Primitives", package: "swift-linter-primitives"),
                 "Primitives Linter Rule RawValue",
                 "Primitives Linter Rule Cardinal",
+                "Primitives Linter Rule Tower",
                 .product(name: "Linter Institute Rules", package: "swift-institute-linter-rules"),
             ]
         ),
@@ -81,6 +94,14 @@ let package = Package(
             name: "Primitives Linter Rule Cardinal Tests",
             dependencies: [
                 "Primitives Linter Rule Cardinal",
+                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
+            ]
+        ),
+        .testTarget(
+            name: "Primitives Linter Rule Tower Tests",
+            dependencies: [
+                "Primitives Linter Rule Tower",
                 .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
                 .product(name: "SwiftParser", package: "swift-syntax"),
             ]
