@@ -31,6 +31,7 @@ internal import SwiftSyntax
 /// - `swift-institute/Research/swiftsyntax-based-custom-linter-investigation.md`
 ///   §"Q2 — Evasion-class closure matrix" (paren-wrap row)
 extension Lint.Rule {
+    /// Flags chained `.rawValue.member` access, including the paren-wrapped `(x.rawValue).member` form, which escapes the typed system ([CONV-016]).
     public static let `chained rawvalue access` = Lint.Rule(
         id: "chained rawvalue access",
         default: .warning,

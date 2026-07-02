@@ -29,6 +29,11 @@ internal import SwiftSyntax
 /// these roots, so the rule self-scopes (validated against the non-tower
 /// ladder at promotion — 0 findings).
 extension Lint.Rule {
+    /// Flags public stored value types rooted in a storage-tower namespace that are not `@frozen` ([API-IMPL-022]).
+    ///
+    /// Views, iterators, and snapshots (`~Escapable` types and the curated
+    /// exemption names) are exempt until cross-module partial consumption is
+    /// demonstrated.
     public static let `frozen tower type` = Lint.Rule(
         id: "frozen tower type",
         default: .warning,

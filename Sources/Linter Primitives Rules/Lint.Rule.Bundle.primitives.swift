@@ -33,6 +33,7 @@ public import Primitives_Linter_Rule_Tower
 /// this bundle; consumers pick up the new rule automatically on their
 /// next dependency-resolution.
 extension Lint.Rule.Bundle {
+    /// The primitives-tier rule bundle: the institute-tier bundle plus the Tower, Cardinal, and RawValue rule packs.
     public static let primitives: [Lint.Rule.Configuration] =
         Lint.Rule.Bundle.institute + [
             // Tower pack (Round M ζ pilot 2026-06-12)

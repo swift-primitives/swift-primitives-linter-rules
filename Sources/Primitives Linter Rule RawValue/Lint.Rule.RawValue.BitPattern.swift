@@ -31,6 +31,7 @@ internal import SwiftSyntax
 /// - `swift-institute/Research/swiftsyntax-based-custom-linter-investigation.md`
 ///   §"Q2 — Evasion-class closure matrix" (typename-swap row)
 extension Lint.Rule {
+    /// Flags `init(bitPattern:)` calls whose argument chains through `.rawValue`, bypassing the typed conversion hierarchy ([CONV-016]).
     public static let `bitpattern rawvalue chain` = Lint.Rule(
         id: "bitpattern rawvalue chain",
         default: .warning,

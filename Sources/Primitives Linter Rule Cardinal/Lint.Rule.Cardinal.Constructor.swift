@@ -24,6 +24,7 @@ internal import SwiftSyntax
 /// - `swift-institute/Research/cardinal-ordinal-vector-enforcement-design.md`
 ///   §"R2. `Cardinal(0)` and `Cardinal(1)`"
 extension Lint.Rule {
+    /// Flags `Cardinal(0)` / `Cardinal(1)` constructor calls with a literal argument; the canonical accessors are `.zero` / `.one` ([INFRA-101]).
     public static let `zero or one literal` = Lint.Rule(
         id: "zero or one literal",
         default: .warning,

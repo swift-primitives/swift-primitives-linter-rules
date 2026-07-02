@@ -28,6 +28,12 @@ internal import SwiftSyntax
 /// post-fork mutation. The same-file twin requirement is the rule's recorded
 /// heuristic (the pinned pair co-locates).
 extension Lint.Rule {
+    /// Flags overloads that replace a `Shared` box under `~Copyable` generic bounds without an implicitly-Copyable same-name twin in the same file ([MEM-COPY-019]).
+    ///
+    /// Under suppression, overload resolution statically selects the
+    /// strategy-less `Shared` init, so the replacement box traps on the first
+    /// post-fork mutation; the [MEM-COPY-017] pinned pair restores the
+    /// strategy-carrying path.
     public static let `clone-less box` = Lint.Rule(
         id: "clone-less box",
         default: .warning,
@@ -209,6 +215,7 @@ internal final class SharedBoxAssignmentFinder: SyntaxVisitor {
     override func visit(_ node: SequenceExprSyntax) -> SyntaxVisitorContinueKind {
         let elements = Swift.Array(node.elements)
         var index = 1
+        // swiftlint:disable:next cardinal_count_minus_one_anti_pattern  // reason: stdlib-Int SwiftSyntax-visitor site — `elements` is a Swift.Array of syntax nodes whose `count` is Int; no typed Cardinal surface exists ([INFRA-025] β path)
         while index < elements.count - 1 {
             if elements[index].is(AssignmentExprSyntax.self),
                 isSelfMember(elements[index - 1]), isSharedCall(elements[index + 1])

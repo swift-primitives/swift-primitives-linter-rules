@@ -29,6 +29,11 @@ internal import SwiftSyntax
 /// member block contains an `InitializerDeclSyntax` with a `public`
 /// modifier. Each public init in the extension is flagged.
 extension Lint.Rule {
+    /// Flags `public init` declarations in extensions on `Tagged`, which bypass the brand owner's bounded construction surface ([PATTERN-019]).
+    ///
+    /// Extensions declaring conformance to a protocol whose contract requires
+    /// the init (literal protocols, `RawRepresentable`, hoisted `` `Protocol` ``
+    /// witnesses) and free-generic-`Tag` domain extensions are exempt.
     public static let `tagged extension public init` = Lint.Rule(
         id: "tagged extension public init",
         default: .warning,

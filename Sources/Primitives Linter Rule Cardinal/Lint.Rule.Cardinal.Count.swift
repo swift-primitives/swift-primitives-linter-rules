@@ -58,6 +58,7 @@ internal import SwiftSyntax
 /// - `swift-institute/Research/swiftsyntax-based-custom-linter-investigation.md`
 ///   §"Q3 — Deferred AST-rule unblocking matrix"
 extension Lint.Rule {
+    /// Flags `<expr>.count - 1` and its semantic equivalents (paren-wrap, cast-outside, algebraic-flip, operand-reorder), which indicate an untyped `count: Int` ([INFRA-200]).
     public static let `count minus one` = Lint.Rule(
         id: "count minus one",
         default: .warning,
