@@ -215,7 +215,13 @@ internal final class SharedBoxAssignmentFinder: SyntaxVisitor {
     override func visit(_ node: SequenceExprSyntax) -> SyntaxVisitorContinueKind {
         let elements = Swift.Array(node.elements)
         var index = 1
-        // swiftlint:disable:next cardinal_count_minus_one_anti_pattern  // reason: stdlib-Int SwiftSyntax-visitor site — `elements` is a Swift.Array of syntax nodes whose `count` is Int; no typed Cardinal surface exists ([INFRA-025] β path)
+        // cardinal_count_minus_one_anti_pattern β-path exemption ([INFRA-025], adjudicated
+        // 2026-07-02): stdlib-Int SwiftSyntax-visitor site — `elements` is a Swift.Array of
+        // syntax nodes whose `count` is Int; no typed Cardinal surface exists. The rule is
+        // repo-disabled by the self-referential exemption in .swiftlint.yml (a directive here
+        // would itself trip superfluous_disable_command on SwiftLint 0.63.3); if that
+        // exemption is lifted, re-apply a disable-next directive for this rule (with this
+        // reason, dash-delimited) at this site.
         while index < elements.count - 1 {
             if elements[index].is(AssignmentExprSyntax.self),
                 isSelfMember(elements[index - 1]), isSharedCall(elements[index + 1])

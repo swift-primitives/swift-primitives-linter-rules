@@ -2,3 +2,18 @@
 # Inherits from the shared parent configuration in swift-primitives
 
 parent_config: https://raw.githubusercontent.com/swift-primitives/.github/main/.swiftlint.yml
+
+# Self-referential linter-domain exemption (2026-07-02, per rule-exemptions
+# skill): this package IMPLEMENTS the cardinal/rawValue/tagged anti-pattern
+# rules, so its rule sources, test names, and fixture strings necessarily
+# QUOTE the anti-patterns they detect (85/86 adjudicated hits are
+# self-quotations). Disabled HERE only — the rules keep firing org-wide via
+# the Tier-2 parent config.
+disabled_rules:
+  - cardinal_count_minus_one_anti_pattern
+  - cardinal_count_minus_one_evasion
+  - cardinal_zero_one_constructor_anti_pattern
+  - chained_rawvalue_access_anti_pattern
+  - chained_rawvalue_access_paren_evasion
+  - bitpattern_rawvalue_chain_anti_pattern
+  - no_tag_suffix_phantom
