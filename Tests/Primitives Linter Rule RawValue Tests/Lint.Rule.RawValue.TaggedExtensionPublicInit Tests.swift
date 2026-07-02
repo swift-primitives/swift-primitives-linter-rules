@@ -9,11 +9,12 @@
 //
 // ===----------------------------------------------------------------------===//
 
-import Testing
-import SwiftSyntax
-import SwiftParser
 import Linter_Primitives
 import Linter_Rules_Test_Support
+import SwiftParser
+import SwiftSyntax
+import Testing
+
 @testable import Primitives_Linter_Rule_RawValue
 
 extension Lint.Rule {
@@ -35,10 +36,10 @@ extension Lint.Rule.`tagged extension public init Tests`.Unit {
     @Test
     func `extension on bare Tagged with public init is flagged`() {
         let source = """
-        extension Tagged {
-            public init(rawValue: String) { fatalError() }
-        }
-        """
+            extension Tagged {
+                public init(rawValue: String) { fatalError() }
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.count == 1)
         if findings.count == 1 {
@@ -49,10 +50,10 @@ extension Lint.Rule.`tagged extension public init Tests`.Unit {
     @Test
     func `extension on Tagged generic specialization with public init is flagged`() {
         let source = """
-        extension Tagged<UserTag, String> {
-            public init(_ s: String) { fatalError() }
-        }
-        """
+            extension Tagged<UserTag, String> {
+                public init(_ s: String) { fatalError() }
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
@@ -60,10 +61,10 @@ extension Lint.Rule.`tagged extension public init Tests`.Unit {
     @Test
     func `extension on Tagged with internal init is permitted`() {
         let source = """
-        extension Tagged {
-            init(rawValue: String) { fatalError() }
-        }
-        """
+            extension Tagged {
+                init(rawValue: String) { fatalError() }
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -71,10 +72,10 @@ extension Lint.Rule.`tagged extension public init Tests`.Unit {
     @Test
     func `extension on non-Tagged type with public init is permitted`() {
         let source = """
-        extension MyType {
-            public init(rawValue: String) { fatalError() }
-        }
-        """
+            extension MyType {
+                public init(rawValue: String) { fatalError() }
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -82,11 +83,11 @@ extension Lint.Rule.`tagged extension public init Tests`.Unit {
     @Test
     func `extension on Tagged with multiple public inits flags each`() {
         let source = """
-        extension Tagged {
-            public init(_ s: String) { fatalError() }
-            public init(value: Int) { fatalError() }
-        }
-        """
+            extension Tagged {
+                public init(_ s: String) { fatalError() }
+                public init(value: Int) { fatalError() }
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
@@ -94,10 +95,10 @@ extension Lint.Rule.`tagged extension public init Tests`.Unit {
     @Test
     func `extension on Tagged with public method but no public init is permitted`() {
         let source = """
-        extension Tagged {
-            public func foo() {}
-        }
-        """
+            extension Tagged {
+                public func foo() {}
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -107,10 +108,10 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
     @Test
     func `extension on qualified Tagging Tagged is flagged`() {
         let source = """
-        extension Tagging.Tagged {
-            public init(_ s: String) { fatalError() }
-        }
-        """
+            extension Tagging.Tagged {
+                public init(_ s: String) { fatalError() }
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
@@ -118,10 +119,10 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
     @Test
     func `extension on Tagged with where clause is flagged`() {
         let source = """
-        extension Tagged where RawValue == String {
-            public init(_ s: String) { fatalError() }
-        }
-        """
+            extension Tagged where RawValue == String {
+                public init(_ s: String) { fatalError() }
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
@@ -129,10 +130,10 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
     @Test
     func `extension on TaggedFoo (compound name) is not flagged`() {
         let source = """
-        extension TaggedFoo {
-            public init(_ s: String) { fatalError() }
-        }
-        """
+            extension TaggedFoo {
+                public init(_ s: String) { fatalError() }
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -147,10 +148,10 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
     @Test
     func `extension on Tagged conforming to ExpressibleByIntegerLiteral is exempt per RULE-EXEMPT-2`() {
         let source = """
-        extension Tagged: ExpressibleByIntegerLiteral {
-            public init(integerLiteral value: Int) { fatalError() }
-        }
-        """
+            extension Tagged: ExpressibleByIntegerLiteral {
+                public init(integerLiteral value: Int) { fatalError() }
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -158,10 +159,10 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
     @Test
     func `extension on Tagged conforming to Decodable is exempt per RULE-EXEMPT-2`() {
         let source = """
-        extension Tagged: Decodable {
-            public init(from decoder: any Decoder) throws { fatalError() }
-        }
-        """
+            extension Tagged: Decodable {
+                public init(from decoder: any Decoder) throws { fatalError() }
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -169,10 +170,10 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
     @Test
     func `extension on Tagged conforming to RawRepresentable is exempt per RULE-EXEMPT-2`() {
         let source = """
-        extension Tagged: RawRepresentable {
-            public init?(rawValue: String) { fatalError() }
-        }
-        """
+            extension Tagged: RawRepresentable {
+                public init?(rawValue: String) { fatalError() }
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -192,10 +193,10 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
     @Test
     func `extension on Tagged conforming to backtick-escaped Protocol sentinel is exempt per RULE-EXEMPT-5`() {
         let source = """
-        extension Tagged: Carrier.`Protocol` {
-            public init(value: Int) { fatalError() }
-        }
-        """
+            extension Tagged: Carrier.`Protocol` {
+                public init(value: Int) { fatalError() }
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -203,10 +204,10 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
     @Test
     func `extension on Tagged conforming to non-witness protocol is still flagged`() {
         let source = """
-        extension Tagged: CustomStringConvertible {
-            public init(_ s: String) { fatalError() }
-        }
-        """
+            extension Tagged: CustomStringConvertible {
+                public init(_ s: String) { fatalError() }
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
@@ -214,11 +215,11 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
     @Test
     func `free-generic-Tag domain extension with Underlying binding is admitted`() {
         let source = """
-        extension Tagged where Underlying == Cardinal, Tag: ~Copyable {
-            public init(_ uint: UInt) { fatalError() }
-            public init(_ int: Int) throws(Cardinal.Error) { fatalError() }
-        }
-        """
+            extension Tagged where Underlying == Cardinal, Tag: ~Copyable {
+                public init(_ uint: UInt) { fatalError() }
+                public init(_ int: Int) throws(Cardinal.Error) { fatalError() }
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         // Free generic Tag has no specific owner at which a per-tag
         // validation gate could live. The Underlying binding (==
@@ -232,10 +233,10 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
     @Test
     func `free-generic-Tag domain extension with Underlying binding (single init) is admitted`() {
         let source = """
-        extension Tagged where Underlying == Cardinal, Tag: ~Copyable {
-            public init(_ index: Tagged<Tag, Ordinal>) { fatalError() }
-        }
-        """
+            extension Tagged where Underlying == Cardinal, Tag: ~Copyable {
+                public init(_ index: Tagged<Tag, Ordinal>) { fatalError() }
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -243,10 +244,10 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
     @Test
     func `extension binding both Underlying and Tag is still flagged (Tag bound)`() {
         let source = """
-        extension Tagged where Underlying == Cardinal, Tag == MySpecificTag {
-            public init(_ raw: Cardinal) { fatalError() }
-        }
-        """
+            extension Tagged where Underlying == Cardinal, Tag == MySpecificTag {
+                public init(_ raw: Cardinal) { fatalError() }
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         // Tag is bound to a concrete (MySpecificTag) so a per-tag
         // validation gate IS expressible here — the rule's intent
@@ -257,10 +258,10 @@ extension Lint.Rule.`tagged extension public init Tests`.`Edge Case` {
     @Test
     func `bare extension on Tagged with no where clause is still flagged`() {
         let source = """
-        extension Tagged {
-            public init(raw: RawValue) { fatalError() }
-        }
-        """
+            extension Tagged {
+                public init(raw: RawValue) { fatalError() }
+            }
+            """
         let findings = Lint.Rule.`tagged extension public init Tests`.findings(in: source)
         // No Underlying binding signals no domain intent. Both axes
         // are free generically, but the absence of Underlying ==

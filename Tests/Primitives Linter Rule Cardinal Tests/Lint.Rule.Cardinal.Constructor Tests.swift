@@ -9,11 +9,12 @@
 //
 // ===----------------------------------------------------------------------===//
 
-import Testing
-import SwiftSyntax
-import SwiftParser
 import Linter_Primitives
 import Linter_Rules_Test_Support
+import SwiftParser
+import SwiftSyntax
+import Testing
+
 @testable import Primitives_Linter_Rule_Cardinal
 
 extension Lint.Rule {
@@ -99,10 +100,10 @@ extension Lint.Rule.`zero or one literal Tests`.`Edge Case` {
     @Test
     func `Multi-line Cardinal with newline-arg is flagged`() {
         let source = """
-        let c = Cardinal(
-            0
-        )
-        """
+            let c = Cardinal(
+                0
+            )
+            """
         let findings = Lint.Rule.`zero or one literal Tests`.findings(in: source)
         #expect(findings.count == 1)
     }

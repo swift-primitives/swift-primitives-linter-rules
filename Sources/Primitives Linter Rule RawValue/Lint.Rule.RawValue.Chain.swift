@@ -46,7 +46,7 @@ extension Lint.Rule {
     )
 }
 
-fileprivate let chainedRawvalueAccessMessage: Swift.String =
+private let chainedRawvalueAccessMessage: Swift.String =
     "[chained rawvalue access] [CONV-016]: chaining `.rawValue.method()` (or "
     + "paren-wrapped `(x.rawValue).method()`, which is semantically identical) escapes "
     + "the typed system. Prefer `.retag()` (Tier 1) / `.map()` (Tier 2) / `Type.min(a, b)` "
@@ -75,30 +75,33 @@ internal final class RawValueChainVisitor: SyntaxVisitor {
         guard let base = node.base else { return .visitChildren }
         let unwrapped = Self.peelParens(base)
         guard let baseAccess = unwrapped.as(MemberAccessExprSyntax.self),
-              baseAccess.declName.baseName.text == "rawValue"
+            baseAccess.declName.baseName.text == "rawValue"
         else { return .visitChildren }
         let token = node.declName.baseName
         let location = converter.location(for: token.positionAfterSkippingLeadingTrivia)
-        matches.append(Diagnostic.Record(
-            location: Source.Location(
-                fileID: source.fileID,
-                filePath: source.filePath,
-                line: location.line,
-                column: location.column
-            ),
-            severity: severity,
-            identifier: "chained rawvalue access",
-            message: chainedRawvalueAccessMessage
-        ))
+        matches.append(
+            Diagnostic.Record(
+                location: Source.Location(
+                    fileID: source.fileID,
+                    filePath: source.filePath,
+                    line: location.line,
+                    column: location.column
+                ),
+                severity: severity,
+                identifier: "chained rawvalue access",
+                message: chainedRawvalueAccessMessage
+            )
+        )
         return .visitChildren
     }
 
     private static func peelParens(_ expr: ExprSyntax) -> ExprSyntax {
         var current = expr
         while let tuple = current.as(TupleExprSyntax.self),
-              tuple.elements.count == 1,
-              let only = tuple.elements.first?.expression,
-              tuple.elements.first?.label == nil {
+            tuple.elements.count == 1,
+            let only = tuple.elements.first?.expression,
+            tuple.elements.first?.label == nil
+        {
             current = only
         }
         return current

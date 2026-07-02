@@ -10,8 +10,8 @@
 // ===----------------------------------------------------------------------===//
 
 public import Linter_Primitives
-internal import SwiftSyntax
 internal import SwiftOperators
+internal import SwiftSyntax
 
 /// R1 — `<expr>.count - 1` and its semantically-equivalent rewrites.
 ///
@@ -107,8 +107,9 @@ internal final class CardinalCountVisitor: SyntaxVisitor {
         let opText = binOp.operator.text
 
         if opText == "-",
-           Self.isLiteralOne(node.rightOperand),
-           Self.containsCountMemberAccess(node.leftOperand) {
+            Self.isLiteralOne(node.rightOperand),
+            Self.containsCountMemberAccess(node.leftOperand)
+        {
             report(at: binOp.operator)
             return .visitChildren
         }
@@ -126,17 +127,19 @@ internal final class CardinalCountVisitor: SyntaxVisitor {
 
     func report(at token: TokenSyntax) {
         let location = converter.location(for: token.positionAfterSkippingLeadingTrivia)
-        matches.append(Diagnostic.Record(
-            location: Source.Location(
-                fileID: source.fileID,
-                filePath: source.filePath,
-                line: location.line,
-                column: location.column
-            ),
-            severity: severity,
-            identifier: "count minus one",
-            message: cardinalCountMinusOneMessage
-        ))
+        matches.append(
+            Diagnostic.Record(
+                location: Source.Location(
+                    fileID: source.fileID,
+                    filePath: source.filePath,
+                    line: location.line,
+                    column: location.column
+                ),
+                severity: severity,
+                identifier: "count minus one",
+                message: cardinalCountMinusOneMessage
+            )
+        )
     }
 
     static func isLiteralOne(_ expr: ExprSyntax) -> Bool {
@@ -153,8 +156,8 @@ internal final class CardinalCountVisitor: SyntaxVisitor {
 
     static func isPlusOne(_ expr: ExprSyntax) -> Bool {
         guard let infix = expr.as(InfixOperatorExprSyntax.self),
-              let binOp = infix.operator.as(BinaryOperatorExprSyntax.self),
-              binOp.operator.text == "+"
+            let binOp = infix.operator.as(BinaryOperatorExprSyntax.self),
+            binOp.operator.text == "+"
         else { return false }
         return isLiteralOne(infix.leftOperand) || isLiteralOne(infix.rightOperand)
     }

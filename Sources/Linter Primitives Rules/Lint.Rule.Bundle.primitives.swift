@@ -9,11 +9,11 @@
 //
 // ===----------------------------------------------------------------------===//
 
+public import Linter_Institute_Rules
 public import Linter_Primitives
 public import Primitives_Linter_Rule_Cardinal
 public import Primitives_Linter_Rule_RawValue
 public import Primitives_Linter_Rule_Tower
-public import Linter_Institute_Rules
 
 /// Primitives-tier rule bundle.
 ///

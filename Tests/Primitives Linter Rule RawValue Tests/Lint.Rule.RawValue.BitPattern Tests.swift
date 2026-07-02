@@ -9,11 +9,12 @@
 //
 // ===----------------------------------------------------------------------===//
 
-import Testing
-import SwiftSyntax
-import SwiftParser
 import Linter_Primitives
 import Linter_Rules_Test_Support
+import SwiftParser
+import SwiftSyntax
+import Testing
+
 @testable import Primitives_Linter_Rule_RawValue
 
 extension Lint.Rule {
@@ -64,13 +65,13 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.Evasion {
     @Test
     func `self.init(bitPattern: x.rawValue) (typename-swap via self) is flagged`() {
         let source = """
-        struct W {
-            init(value: X) {
-                self.init(bitPattern: value.rawValue)
+            struct W {
+                init(value: X) {
+                    self.init(bitPattern: value.rawValue)
+                }
+                init(bitPattern: Int) {}
             }
-            init(bitPattern: Int) {}
-        }
-        """
+            """
         let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
@@ -128,9 +129,9 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.Negative {
     @Test
     func `Comment containing the pattern is NOT flagged`() {
         let source = """
-        // Int(bitPattern: x.rawValue) is the canonical anti-pattern
-        let y = 42
-        """
+            // Int(bitPattern: x.rawValue) is the canonical anti-pattern
+            let y = 42
+            """
         let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -154,10 +155,10 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.`Edge Case` {
     @Test
     func `Multi-line Int(bitPattern: ... rawValue) is flagged`() {
         let source = """
-        let i = Int(
-            bitPattern: x.rawValue
-        )
-        """
+            let i = Int(
+                bitPattern: x.rawValue
+            )
+            """
         let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
@@ -165,9 +166,9 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.`Edge Case` {
     @Test
     func `Multiple bitPattern calls each flagged`() {
         let source = """
-        let a = Int(bitPattern: x.rawValue)
-        let b = UInt(bitPattern: y.rawValue)
-        """
+            let a = Int(bitPattern: x.rawValue)
+            let b = UInt(bitPattern: y.rawValue)
+            """
         let findings = Lint.Rule.`bitpattern rawvalue chain Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
@@ -183,4 +184,3 @@ extension Lint.Rule.`bitpattern rawvalue chain Tests`.`Edge Case` {
         }
     }
 }
-

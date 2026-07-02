@@ -44,7 +44,7 @@ extension Lint.Rule {
     )
 }
 
-fileprivate let frozenTowerTypeMessage: Swift.String =
+private let frozenTowerTypeMessage: Swift.String =
     "[frozen tower type] [API-IMPL-022]: public stored value types in the storage tower "
     + "are @frozen (layout-locked from birth) so cross-module consuming decomposition "
     + "(take()-style unwraps, consuming makeIterator()) stays legal without "
@@ -88,8 +88,8 @@ internal final class FrozenTowerTypeVisitor: SyntaxVisitor {
         guard !hasFrozen(node.attributes) else { return .visitChildren }
         let name = node.name.text
         guard !Self.exemptNames.contains(name),
-              !name.hasSuffix("Iterator"),
-              !name.hasSuffix("View")
+            !name.hasSuffix("Iterator"),
+            !name.hasSuffix("View")
         else { return .visitChildren }
         guard !suppressesEscapable(node.inheritanceClause) else { return .visitChildren }
         guard hasStoredProperty(node.memberBlock) else { return .visitChildren }
@@ -99,17 +99,19 @@ internal final class FrozenTowerTypeVisitor: SyntaxVisitor {
 
         let token = node.name
         let location = converter.location(for: token.positionAfterSkippingLeadingTrivia)
-        matches.append(Diagnostic.Record(
-            location: Source.Location(
-                fileID: source.fileID,
-                filePath: source.filePath,
-                line: location.line,
-                column: location.column
-            ),
-            severity: severity,
-            identifier: "frozen tower type",
-            message: frozenTowerTypeMessage
-        ))
+        matches.append(
+            Diagnostic.Record(
+                location: Source.Location(
+                    fileID: source.fileID,
+                    filePath: source.filePath,
+                    line: location.line,
+                    column: location.column
+                ),
+                severity: severity,
+                identifier: "frozen tower type",
+                message: frozenTowerTypeMessage
+            )
+        )
         return .visitChildren
     }
 
@@ -155,8 +157,9 @@ internal final class FrozenTowerTypeVisitor: SyntaxVisitor {
             if let ext = ancestor.as(ExtensionDeclSyntax.self) {
                 outermost = baseIdentifier(of: ext.extendedType)
             } else if let nominal = ancestor.asProtocol(NamedDeclSyntax.self),
-                      ancestor.is(StructDeclSyntax.self) || ancestor.is(EnumDeclSyntax.self)
-                        || ancestor.is(ClassDeclSyntax.self) || ancestor.is(ActorDeclSyntax.self) {
+                ancestor.is(StructDeclSyntax.self) || ancestor.is(EnumDeclSyntax.self)
+                    || ancestor.is(ClassDeclSyntax.self) || ancestor.is(ActorDeclSyntax.self)
+            {
                 outermost = nominal.name.text
             }
             current = ancestor.parent

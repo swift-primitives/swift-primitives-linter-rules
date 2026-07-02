@@ -9,11 +9,12 @@
 //
 // ===----------------------------------------------------------------------===//
 
-import Testing
-import SwiftSyntax
-import SwiftParser
 import Linter_Primitives
 import Linter_Rules_Test_Support
+import SwiftParser
+import SwiftSyntax
+import Testing
+
 @testable import Primitives_Linter_Rule_RawValue
 
 extension Lint.Rule {
@@ -96,9 +97,9 @@ extension Lint.Rule.`chained rawvalue access Tests`.`Edge Case` {
     @Test
     func `x.rawValue in comment is NOT flagged`() {
         let source = """
-        // x.rawValue.foo is the canonical anti-pattern
-        let y = 42
-        """
+            // x.rawValue.foo is the canonical anti-pattern
+            let y = 42
+            """
         let findings = Lint.Rule.`chained rawvalue access Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -112,9 +113,9 @@ extension Lint.Rule.`chained rawvalue access Tests`.`Edge Case` {
     @Test
     func `Multiple chained accesses each flagged`() {
         let source = """
-        let a = x.rawValue.foo
-        let b = y.rawValue.bar
-        """
+            let a = x.rawValue.foo
+            let b = y.rawValue.bar
+            """
         let findings = Lint.Rule.`chained rawvalue access Tests`.findings(in: source)
         #expect(findings.count == 2)
     }
@@ -130,4 +131,3 @@ extension Lint.Rule.`chained rawvalue access Tests`.`Edge Case` {
         }
     }
 }
-

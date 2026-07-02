@@ -77,17 +77,19 @@ internal final class CardinalConstructorVisitor: SyntaxVisitor {
         }
         let token = node.calledExpression.firstToken(viewMode: .sourceAccurate) ?? lit.literal
         let location = converter.location(for: token.positionAfterSkippingLeadingTrivia)
-        matches.append(Diagnostic.Record(
-            location: Source.Location(
-                fileID: source.fileID,
-                filePath: source.filePath,
-                line: location.line,
-                column: location.column
-            ),
-            severity: severity,
-            identifier: "zero or one literal",
-            message: cardinalZeroOneConstructorMessage
-        ))
+        matches.append(
+            Diagnostic.Record(
+                location: Source.Location(
+                    fileID: source.fileID,
+                    filePath: source.filePath,
+                    line: location.line,
+                    column: location.column
+                ),
+                severity: severity,
+                identifier: "zero or one literal",
+                message: cardinalZeroOneConstructorMessage
+            )
+        )
         return .visitChildren
     }
 
@@ -99,8 +101,9 @@ internal final class CardinalConstructorVisitor: SyntaxVisitor {
             return calleeTypeName(generic.expression)
         }
         if let member = expr.as(MemberAccessExprSyntax.self),
-           member.declName.baseName.text == "init",
-           let base = member.base {
+            member.declName.baseName.text == "init",
+            let base = member.base
+        {
             return calleeTypeName(base)
         }
         return nil

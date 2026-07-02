@@ -43,7 +43,7 @@ extension Lint.Rule {
     )
 }
 
-fileprivate let cloneLessBoxMessage: Swift.String =
+private let cloneLessBoxMessage: Swift.String =
     "[clone-less box] [MEM-COPY-019]: this overload replaces a Shared box under "
     + "~Copyable element bounds with no implicitly-Copyable same-name twin in this "
     + "file. Overload resolution statically selects the strategy-less Shared init, so "
@@ -100,7 +100,8 @@ internal final class CloneLessBoxVisitor: SyntaxVisitor {
 
     func finish() -> [Diagnostic.Record] {
         let twinNames = Swift.Set(candidates.filter { !$0.suppressed }.map(\.name))
-        return candidates
+        return
+            candidates
             .filter { $0.suppressed && $0.assignsBox && !twinNames.contains($0.name) }
             .map { candidate in
                 let location = converter.location(
@@ -128,17 +129,21 @@ internal final class CloneLessBoxVisitor: SyntaxVisitor {
         body: CodeBlockSyntax?
     ) {
         guard let body else { return }
-        candidates.append(Candidate(
-            name: name,
-            suppressed: suppressesOwnParameter(genericParameters, whereClause),
-            assignsBox: assignsSharedBox(body),
-            token: token
-        ))
+        candidates.append(
+            Candidate(
+                name: name,
+                suppressed: suppressesOwnParameter(genericParameters, whereClause),
+                assignsBox: assignsSharedBox(body),
+                token: token
+            )
+        )
     }
 
     /// Whether the decl's OWN generic parameters carry a `~Copyable` suppression —
     /// inline (`<V: ~Copyable>`) or via the decl's where clause (`where V: ~Copyable`
-    /// for an own parameter). Extension-level suppression does not count.
+    /// for an own parameter).
+    ///
+    /// Extension-level suppression does not count.
     private func suppressesOwnParameter(
         _ genericParameters: GenericParameterClauseSyntax?,
         _ whereClause: GenericWhereClauseSyntax?
@@ -154,9 +159,9 @@ internal final class CloneLessBoxVisitor: SyntaxVisitor {
         guard let whereClause else { return false }
         for requirement in whereClause.requirements {
             guard let conformance = requirement.requirement.as(ConformanceRequirementSyntax.self),
-                  let subject = conformance.leftType.as(IdentifierTypeSyntax.self),
-                  ownNames.contains(subject.name.text),
-                  containsSuppressedCopyable(conformance.rightType)
+                let subject = conformance.leftType.as(IdentifierTypeSyntax.self),
+                ownNames.contains(subject.name.text),
+                containsSuppressedCopyable(conformance.rightType)
             else { continue }
             return true
         }
@@ -191,7 +196,8 @@ internal final class SharedBoxAssignmentFinder: SyntaxVisitor {
     /// Folded trees (`SwiftOperators` consumers).
     override func visit(_ node: InfixOperatorExprSyntax) -> SyntaxVisitorContinueKind {
         if node.operator.is(AssignmentExprSyntax.self),
-           isSelfMember(node.leftOperand), isSharedCall(node.rightOperand) {
+            isSelfMember(node.leftOperand), isSharedCall(node.rightOperand)
+        {
             found = true
             return .skipChildren
         }
@@ -205,7 +211,8 @@ internal final class SharedBoxAssignmentFinder: SyntaxVisitor {
         var index = 1
         while index < elements.count - 1 {
             if elements[index].is(AssignmentExprSyntax.self),
-               isSelfMember(elements[index - 1]), isSharedCall(elements[index + 1]) {
+                isSelfMember(elements[index - 1]), isSharedCall(elements[index + 1])
+            {
                 found = true
                 return .skipChildren
             }

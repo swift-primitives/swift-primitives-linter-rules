@@ -46,7 +46,7 @@ extension Lint.Rule {
     )
 }
 
-fileprivate let bitpatternRawvalueChainMessage: Swift.String =
+private let bitpatternRawvalueChainMessage: Swift.String =
     "[bitpattern rawvalue chain] [CONV-016]: `init(bitPattern:)` whose argument chains "
     + "through `.rawValue` — including `Int(...)`, `UInt(...)`, `Int.init(...)`, "
     + "`self.init(...)`, and other syntactic equivalents — bypasses the canonical "
@@ -79,17 +79,19 @@ internal final class RawValueBitPatternVisitor: SyntaxVisitor {
             guard let label = arg.label, label.text == "bitPattern" else { continue }
             guard Self.containsRawValueAccess(arg.expression) else { continue }
             let location = converter.location(for: label.positionAfterSkippingLeadingTrivia)
-            matches.append(Diagnostic.Record(
-                location: Source.Location(
-                    fileID: source.fileID,
-                    filePath: source.filePath,
-                    line: location.line,
-                    column: location.column
-                ),
-                severity: severity,
-                identifier: "bitpattern rawvalue chain",
-                message: bitpatternRawvalueChainMessage
-            ))
+            matches.append(
+                Diagnostic.Record(
+                    location: Source.Location(
+                        fileID: source.fileID,
+                        filePath: source.filePath,
+                        line: location.line,
+                        column: location.column
+                    ),
+                    severity: severity,
+                    identifier: "bitpattern rawvalue chain",
+                    message: bitpatternRawvalueChainMessage
+                )
+            )
         }
         return .visitChildren
     }

@@ -44,7 +44,7 @@ extension Lint.Rule {
     )
 }
 
-fileprivate let taggedExtensionPublicInitMessage: Swift.String =
+private let taggedExtensionPublicInitMessage: Swift.String =
     "[tagged extension public init] [PATTERN-019]: extensions on `Tagged` "
     + "MUST NOT provide `public init` — bypasses the brand's bounded invariants. "
     + "Callers reaching through an extension init never cross the validation gate "
@@ -53,7 +53,9 @@ fileprivate let taggedExtensionPublicInitMessage: Swift.String =
 
 /// Stdlib / institute protocols whose `public init(...)` requirement
 /// is the protocol contract — the conformer MUST provide the init or
-/// the conformance is impossible. The validation gate IS the protocol
+/// the conformance is impossible.
+///
+/// The validation gate IS the protocol
 /// requirement (each init's body still delegates to the underlying
 /// type's literal-protocol witness for actual validation). Exempt
 /// these inits from the brand-bypass rule when declared inside an
@@ -79,23 +81,23 @@ fileprivate let taggedExtensionPublicInitMessage: Swift.String =
 /// citation is indefensible at review time.
 ///
 /// Skill home: swift-institute/Skills/rule-exemptions/SKILL.md.
-fileprivate let taggedExtensionPublicInitProtocolWitnessCitations: [Swift.String: Swift.String] = [
-    "ExpressibleByIntegerLiteral":                 "Swift.ExpressibleByIntegerLiteral — init(integerLiteral:) protocol witness",
-    "ExpressibleByFloatLiteral":                   "Swift.ExpressibleByFloatLiteral — init(floatLiteral:) protocol witness",
-    "ExpressibleByUnicodeScalarLiteral":           "Swift.ExpressibleByUnicodeScalarLiteral — init(unicodeScalarLiteral:) protocol witness",
+private let taggedExtensionPublicInitProtocolWitnessCitations: [Swift.String: Swift.String] = [
+    "ExpressibleByIntegerLiteral": "Swift.ExpressibleByIntegerLiteral — init(integerLiteral:) protocol witness",
+    "ExpressibleByFloatLiteral": "Swift.ExpressibleByFloatLiteral — init(floatLiteral:) protocol witness",
+    "ExpressibleByUnicodeScalarLiteral": "Swift.ExpressibleByUnicodeScalarLiteral — init(unicodeScalarLiteral:) protocol witness",
     "ExpressibleByExtendedGraphemeClusterLiteral": "Swift.ExpressibleByExtendedGraphemeClusterLiteral — init(extendedGraphemeClusterLiteral:) protocol witness",
-    "ExpressibleByStringLiteral":                  "Swift.ExpressibleByStringLiteral — init(stringLiteral:) protocol witness",
-    "ExpressibleByBooleanLiteral":                 "Swift.ExpressibleByBooleanLiteral — init(booleanLiteral:) protocol witness",
-    "ExpressibleByStringInterpolation":            "Swift.ExpressibleByStringInterpolation — init(stringInterpolation:) protocol witness",
-    "ExpressibleByArrayLiteral":                   "Swift.ExpressibleByArrayLiteral — init(arrayLiteral:) protocol witness",
-    "ExpressibleByDictionaryLiteral":              "Swift.ExpressibleByDictionaryLiteral — init(dictionaryLiteral:) protocol witness",
-    "ExpressibleByNilLiteral":                     "Swift.ExpressibleByNilLiteral — init(nilLiteral:) protocol witness",
-    "LosslessStringConvertible":                   "Swift.LosslessStringConvertible — init?(_:) protocol witness",
-    "RawRepresentable":                            "Swift.RawRepresentable — init?(rawValue:) protocol witness",
-    "Decodable":                                   "Swift.Decodable — init(from:) protocol witness",
-    "Codable":                                     "Swift.Codable — Decodable.init(from:) protocol witness",
-    "Protocol":                                    "Institute hoisted-protocol witness ([API-IMPL-009] pattern; e.g., Carrier.Protocol)",
-    "`Protocol`":                                  "Institute hoisted-protocol witness ([API-IMPL-009] pattern; e.g., Carrier.`Protocol`)",
+    "ExpressibleByStringLiteral": "Swift.ExpressibleByStringLiteral — init(stringLiteral:) protocol witness",
+    "ExpressibleByBooleanLiteral": "Swift.ExpressibleByBooleanLiteral — init(booleanLiteral:) protocol witness",
+    "ExpressibleByStringInterpolation": "Swift.ExpressibleByStringInterpolation — init(stringInterpolation:) protocol witness",
+    "ExpressibleByArrayLiteral": "Swift.ExpressibleByArrayLiteral — init(arrayLiteral:) protocol witness",
+    "ExpressibleByDictionaryLiteral": "Swift.ExpressibleByDictionaryLiteral — init(dictionaryLiteral:) protocol witness",
+    "ExpressibleByNilLiteral": "Swift.ExpressibleByNilLiteral — init(nilLiteral:) protocol witness",
+    "LosslessStringConvertible": "Swift.LosslessStringConvertible — init?(_:) protocol witness",
+    "RawRepresentable": "Swift.RawRepresentable — init?(rawValue:) protocol witness",
+    "Decodable": "Swift.Decodable — init(from:) protocol witness",
+    "Codable": "Swift.Codable — Decodable.init(from:) protocol witness",
+    "Protocol": "Institute hoisted-protocol witness ([API-IMPL-009] pattern; e.g., Carrier.Protocol)",
+    "`Protocol`": "Institute hoisted-protocol witness ([API-IMPL-009] pattern; e.g., Carrier.`Protocol`)",
 ]
 
 internal final class RawValueTaggedExtensionPublicInitVisitor: SyntaxVisitor {
@@ -139,7 +141,9 @@ internal final class RawValueTaggedExtensionPublicInitVisitor: SyntaxVisitor {
     }
 
     /// Returns the leaf protocol names from the extension's inheritance
-    /// clause. Used to gate the protocol-witness exemption.
+    /// clause.
+    ///
+    /// Used to gate the protocol-witness exemption.
     private func inheritanceLeafNames(_ clause: InheritanceClauseSyntax?) -> [Swift.String] {
         guard let clause else { return [] }
         var names: [Swift.String] = []
@@ -155,7 +159,9 @@ internal final class RawValueTaggedExtensionPublicInitVisitor: SyntaxVisitor {
 
     /// Returns true when the where clause binds `Underlying` to a
     /// concrete type via `SameTypeRequirementSyntax` AND does NOT bind
-    /// `Tag` to a concrete type via the same. The first condition signals
+    /// `Tag` to a concrete type via the same.
+    ///
+    /// The first condition signals
     /// "this extension is a domain extension on the Underlying axis";
     /// the second signals "Tag is free / generic / constrained but not
     /// bound." Together they identify the free-generic-Tag domain
@@ -221,17 +227,19 @@ internal final class RawValueTaggedExtensionPublicInitVisitor: SyntaxVisitor {
                 continue
             }
             let location = converter.location(for: initDecl.initKeyword.positionAfterSkippingLeadingTrivia)
-            matches.append(Diagnostic.Record(
-                location: Source.Location(
-                    fileID: source.fileID,
-                    filePath: source.filePath,
-                    line: location.line,
-                    column: location.column
-                ),
-                severity: severity,
-                identifier: "tagged extension public init",
-                message: taggedExtensionPublicInitMessage
-            ))
+            matches.append(
+                Diagnostic.Record(
+                    location: Source.Location(
+                        fileID: source.fileID,
+                        filePath: source.filePath,
+                        line: location.line,
+                        column: location.column
+                    ),
+                    severity: severity,
+                    identifier: "tagged extension public init",
+                    message: taggedExtensionPublicInitMessage
+                )
+            )
         }
         return .visitChildren
     }

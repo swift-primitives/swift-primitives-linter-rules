@@ -9,11 +9,12 @@
 //
 // ===----------------------------------------------------------------------===//
 
-import Testing
-import SwiftSyntax
-import SwiftParser
 import Linter_Primitives
 import Linter_Rules_Test_Support
+import SwiftParser
+import SwiftSyntax
+import Testing
+
 @testable import Primitives_Linter_Rule_Cardinal
 
 extension Lint.Rule {
@@ -109,9 +110,9 @@ extension Lint.Rule.`count minus one Tests`.Evasion {
     @Test
     func `Comments-as-code is NOT flagged`() {
         let source = """
-        // seq.count - 1 is the canonical anti-pattern (this is just prose)
-        let x = 42
-        """
+            // seq.count - 1 is the canonical anti-pattern (this is just prose)
+            let x = 42
+            """
         let findings = Lint.Rule.`count minus one Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -159,9 +160,9 @@ extension Lint.Rule.`count minus one Tests`.Negative {
     @Test
     func `Local binding let count = i; count - 1 is NOT flagged`() {
         let source = """
-        let count = i
-        let last = count - 1
-        """
+            let count = i
+            let last = count - 1
+            """
         let findings = Lint.Rule.`count minus one Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -169,10 +170,10 @@ extension Lint.Rule.`count minus one Tests`.Negative {
     @Test
     func `Loop variable for count in 0..<n; count - 1 is NOT flagged`() {
         let source = """
-        for count in 0..<n {
-            _ = count - 1
-        }
-        """
+            for count in 0..<n {
+                _ = count - 1
+            }
+            """
         let findings = Lint.Rule.`count minus one Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -194,11 +195,11 @@ extension Lint.Rule.`count minus one Tests`.`Edge Case` {
     @Test
     func `Multi-line nested algebraic-flip is flagged`() {
         let source = """
-        if i + 1
-            < seq.count {
-            doSomething()
-        }
-        """
+            if i + 1
+                < seq.count {
+                doSomething()
+            }
+            """
         let findings = Lint.Rule.`count minus one Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
