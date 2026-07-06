@@ -39,6 +39,8 @@ extension Lint.Rule.Bundle {
             // Tower pack (Round M ζ pilot 2026-06-12)
             .enable(.`frozen tower type`),
             .enable(.`clone-less box`),
+            // [DS-026](a) direct type-level seam-bound (/promote-rule 2026-07-06)
+            .enable(.`carrier column bound`),
             // Cardinal pack (Wave 3 2026-05-15)
             .enable(.`zero or one literal`),
             .enable(.`count minus one`),
