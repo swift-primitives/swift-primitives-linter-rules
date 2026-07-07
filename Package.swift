@@ -19,16 +19,9 @@ let package = Package(
         .macOS(.v26),
     ],
     products: [
-        .library(
-            name: "Primitives Linter Rule RawValue",
-            targets: ["Primitives Linter Rule RawValue"]
-        ),
-        // Wave 3 (2026-05-15) — relocated from swift-linter-rules per
-        // three-tier-linter-rules-partition.md.
-        .library(
-            name: "Primitives Linter Rule Cardinal",
-            targets: ["Primitives Linter Rule Cardinal"]
-        ),
+        // A5 move (2026-07-07) — the RawValue and Cardinal brand-consumer
+        // packs relocated to swift-institute-linter-rules so they enforce at
+        // L2/L3 too. Only the tower-author rules (genuinely L1-only) remain.
         // Round M ζ pilot (2026-06-12) — tower-scoped structural rules.
         .library(
             name: "Primitives Linter Rule Tower",
@@ -51,21 +44,6 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Primitives Linter Rule RawValue",
-            dependencies: [
-                .product(name: "Linter Primitives", package: "swift-linter-primitives"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Primitives Linter Rule Cardinal",
-            dependencies: [
-                .product(name: "Linter Primitives", package: "swift-linter-primitives"),
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
-                .product(name: "SwiftOperators", package: "swift-syntax"),
-            ]
-        ),
-        .target(
             name: "Primitives Linter Rule Tower",
             dependencies: [
                 .product(name: "Linter Primitives", package: "swift-linter-primitives"),
@@ -76,26 +54,8 @@ let package = Package(
             name: "Linter Primitives Rules",
             dependencies: [
                 .product(name: "Linter Primitives", package: "swift-linter-primitives"),
-                "Primitives Linter Rule RawValue",
-                "Primitives Linter Rule Cardinal",
                 "Primitives Linter Rule Tower",
                 .product(name: "Linter Institute Rules", package: "swift-institute-linter-rules"),
-            ]
-        ),
-        .testTarget(
-            name: "Primitives Linter Rule RawValue Tests",
-            dependencies: [
-                "Primitives Linter Rule RawValue",
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
-            ]
-        ),
-        .testTarget(
-            name: "Primitives Linter Rule Cardinal Tests",
-            dependencies: [
-                "Primitives Linter Rule Cardinal",
-                .product(name: "Linter Rules Test Support", package: "swift-linter-rules"),
-                .product(name: "SwiftParser", package: "swift-syntax"),
             ]
         ),
         .testTarget(

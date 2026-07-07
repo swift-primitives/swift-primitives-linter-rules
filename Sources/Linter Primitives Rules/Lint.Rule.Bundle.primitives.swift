@@ -11,8 +11,6 @@
 
 public import Linter_Institute_Rules
 public import Linter_Primitives
-public import Primitives_Linter_Rule_Cardinal
-public import Primitives_Linter_Rule_RawValue
 public import Primitives_Linter_Rule_Tower
 
 /// Primitives-tier rule bundle.
@@ -33,7 +31,16 @@ public import Primitives_Linter_Rule_Tower
 /// this bundle; consumers pick up the new rule automatically on their
 /// next dependency-resolution.
 extension Lint.Rule.Bundle {
-    /// The primitives-tier rule bundle: the institute-tier bundle plus the Tower, Cardinal, and RawValue rule packs.
+    /// The primitives-tier rule bundle: the institute-tier bundle plus the Tower rule pack.
+    ///
+    /// A5 move (2026-07-07, principal ruling): the Cardinal and RawValue
+    /// brand-consumer packs relocated to swift-institute-linter-rules so they
+    /// enforce at L2/L3 too (brands are defined at L1 but consumed
+    /// everywhere) — they now arrive here transitively via
+    /// `Lint.Rule.Bundle.institute`, leaving effective L1 coverage unchanged.
+    /// Precedent: [PRIM-FOUND-001] made the same primitives→institute move
+    /// mid-pilot. Only the tower-author rules (genuinely L1-only) remain in
+    /// this package.
     public static let primitives: [Lint.Rule.Configuration] =
         Lint.Rule.Bundle.institute + [
             // Tower pack (Round M ζ pilot 2026-06-12)
@@ -41,18 +48,5 @@ extension Lint.Rule.Bundle {
             .enable(.`clone-less box`),
             // [DS-026](a) direct type-level seam-bound (/promote-rule 2026-07-06)
             .enable(.`carrier column bound`),
-            // Cardinal pack (Wave 3 2026-05-15)
-            .enable(.`zero or one literal`),
-            .enable(.`count minus one`),
-            // RawValue pack
-            .enable(.`bitpattern rawvalue chain`),
-            .enable(.`chained rawvalue access`),
-            .enable(.`tagged extension public init`),
-            // [CONV-015] — promoted 2026-07-07 (principal ruling, option a)
-            // from swift-tagged-primitives' nested Lint/ PoC
-            // (Lint.Rule.TaggedDomainAudit); map/retag/@Test exemptions
-            // preserved. Receipt:
-            // Research/promote-tagged-unchecked-validation-2026-07-07.md.
-            .enable(.`tagged unchecked with typed alternative`),
         ]
 }
