@@ -51,9 +51,9 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.Unit {
     @Test
     func `Tagged bare with _unchecked is flagged`() {
         let source = """
-        let value: Tagged<Tag, Int> = Tagged(_unchecked: 7)
-        _ = value
-        """
+            let value: Tagged<Tag, Int> = Tagged(_unchecked: 7)
+            _ = value
+            """
         let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
@@ -68,10 +68,10 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.Unit {
     @Test
     func `multiple Tagged _unchecked sites are all flagged`() {
         let source = """
-        let a = Tagged<TagA, Int>(_unchecked: 1)
-        let b = Tagged<TagB, Int>(_unchecked: 2)
-        let c = Tagged<TagC, Int>(_unchecked: 3)
-        """
+            let a = Tagged<TagA, Int>(_unchecked: 1)
+            let b = Tagged<TagB, Int>(_unchecked: 2)
+            let c = Tagged<TagC, Int>(_unchecked: 3)
+            """
         let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(in: source)
         #expect(findings.count == 3)
     }
@@ -79,11 +79,11 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.Unit {
     @Test
     func `Tagged with _unchecked inside non-exempt function is flagged`() {
         let source = """
-        func someBehavior() {
-            let x = Tagged<Tag, Int>(_unchecked: 42)
-            _ = x
-        }
-        """
+            func someBehavior() {
+                let x = Tagged<Tag, Int>(_unchecked: 42)
+                _ = x
+            }
+            """
         let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(in: source)
         #expect(findings.count == 1)
     }
@@ -107,12 +107,12 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.`Edge Case` 
     @Test
     func `self init with _unchecked inside Tagged extension is NOT flagged`() {
         let source = """
-        extension Tagged {
-            init(other: Underlying) {
-                self.init(_unchecked: other)
+            extension Tagged {
+                init(other: Underlying) {
+                    self.init(_unchecked: other)
+                }
             }
-        }
-        """
+            """
         let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -143,14 +143,14 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.`Edge Case` 
         // fleet's only pre-promotion mention (swift-linter-primitives
         // Lint.Rule.Bundle.swift:45 doc example) must stay silent.
         let source = """
-        /// Enable via:
-        ///
-        /// ```swift
-        /// let x = Tagged<Tag, Int>(_unchecked: 42)
-        /// Lint.Rule.Configuration.enable(.`tagged unchecked with typed alternative`)
-        /// ```
-        public struct Marker {}
-        """
+            /// Enable via:
+            ///
+            /// ```swift
+            /// let x = Tagged<Tag, Int>(_unchecked: 42)
+            /// Lint.Rule.Configuration.enable(.`tagged unchecked with typed alternative`)
+            /// ```
+            public struct Marker {}
+            """
         let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -158,15 +158,15 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.`Edge Case` 
     @Test
     func `Tagged with _unchecked inside map function is NOT flagged`() {
         let source = """
-        extension Tagged where Tag: ~Copyable & ~Escapable, Underlying: ~Copyable {
-            public static func map<E: Swift.Error, NewUnderlying: ~Copyable>(
-                _ tagged: consuming Tagged,
-                transform: (consuming Underlying) throws(E) -> NewUnderlying
-            ) throws(E) -> Tagged<Tag, NewUnderlying> {
-                Tagged<Tag, NewUnderlying>(_unchecked: try transform(tagged.underlying))
+            extension Tagged where Tag: ~Copyable & ~Escapable, Underlying: ~Copyable {
+                public static func map<E: Swift.Error, NewUnderlying: ~Copyable>(
+                    _ tagged: consuming Tagged,
+                    transform: (consuming Underlying) throws(E) -> NewUnderlying
+                ) throws(E) -> Tagged<Tag, NewUnderlying> {
+                    Tagged<Tag, NewUnderlying>(_unchecked: try transform(tagged.underlying))
+                }
             }
-        }
-        """
+            """
         let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -174,15 +174,15 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.`Edge Case` 
     @Test
     func `Tagged with _unchecked inside retag function is NOT flagged`() {
         let source = """
-        extension Tagged where Tag: ~Copyable & ~Escapable, Underlying: ~Copyable {
-            public static func retag<New: ~Copyable & ~Escapable>(
-                _ tagged: consuming Tagged,
-                to _: New.Type = New.self
-            ) -> Tagged<New, Underlying> {
-                Tagged<New, Underlying>(_unchecked: tagged.underlying)
+            extension Tagged where Tag: ~Copyable & ~Escapable, Underlying: ~Copyable {
+                public static func retag<New: ~Copyable & ~Escapable>(
+                    _ tagged: consuming Tagged,
+                    to _: New.Type = New.self
+                ) -> Tagged<New, Underlying> {
+                    Tagged<New, Underlying>(_unchecked: tagged.underlying)
+                }
             }
-        }
-        """
+            """
         let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -190,12 +190,12 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.`Edge Case` 
     @Test
     func `Tagged with _unchecked inside @Test function is NOT flagged`() {
         let source = """
-        @Test
-        func someBehavior() {
-            let x = Tagged<Tag, Int>(_unchecked: 42)
-            _ = x
-        }
-        """
+            @Test
+            func someBehavior() {
+                let x = Tagged<Tag, Int>(_unchecked: 42)
+                _ = x
+            }
+            """
         let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }
@@ -203,12 +203,12 @@ extension Lint.Rule.`tagged unchecked with typed alternative Tests`.`Edge Case` 
     @Test
     func `Tagged with _unchecked inside @Test function with module qualifier is NOT flagged`() {
         let source = """
-        @Testing.Test
-        func someBehavior() {
-            let x = Tagged<Tag, Int>(_unchecked: 42)
-            _ = x
-        }
-        """
+            @Testing.Test
+            func someBehavior() {
+                let x = Tagged<Tag, Int>(_unchecked: 42)
+                _ = x
+            }
+            """
         let findings = Lint.Rule.`tagged unchecked with typed alternative Tests`.findings(in: source)
         #expect(findings.isEmpty)
     }

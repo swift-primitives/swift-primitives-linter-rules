@@ -43,6 +43,7 @@ internal import SwiftSyntax
 /// was a nested-package-mechanism proof and is intentionally dropped —
 /// the predicate is purely syntactic.
 extension Lint.Rule {
+    /// Flags `Tagged<…>(_unchecked:)` construction sites that should use a typed alternative.
     public static let `tagged unchecked with typed alternative` = Lint.Rule(
         id: "tagged unchecked with typed alternative",
         default: .warning,
@@ -70,7 +71,9 @@ internal let rawValueTaggedUncheckedMessage: Swift.String =
 /// Functions whose `_unchecked:` use is structurally authorized — the
 /// underlying value is either opaque-by-construction (transform-closure
 /// output) or validated by an upstream Tagged construction invariant
-/// (phantom-tag swap). Inside these contexts, the rule's "prefer a typed
+/// (phantom-tag swap).
+///
+/// Inside these contexts, the rule's "prefer a typed
 /// init" advice cannot apply because no typed init exists for the
 /// opaque or already-validated value.
 ///
@@ -78,12 +81,14 @@ internal let rawValueTaggedUncheckedMessage: Swift.String =
 /// decl; if its name matches an entry, exempt the use.
 @usableFromInline
 internal let rawValueTaggedUncheckedExemptOperations: [Swift.String: Swift.String] = [
-    "map":   "preserve-shape transform; closure output is opaque-by-construction",
+    "map": "preserve-shape transform; closure output is opaque-by-construction",
     "retag": "phantom-tag swap; underlying validated upstream by Tagged construction invariant",
 ]
 
 /// Attribute names whose presence on the enclosing function decl exempts
-/// the `_unchecked:` use. Currently `@Test` (swift-testing): a test
+/// the `_unchecked:` use.
+///
+/// Currently `@Test` (swift-testing): a test
 /// function legitimately exercises the full API surface including
 /// `_unchecked` — for example, when Underlying is `~Copyable` (literal
 /// init structurally cannot fit), when the test directly compares
@@ -98,7 +103,7 @@ internal let rawValueTaggedUncheckedExemptOperations: [Swift.String: Swift.Strin
 /// rule's recommendation does not apply.
 @usableFromInline
 internal let rawValueTaggedUncheckedExemptAttributes: [Swift.String: Swift.String] = [
-    "Test": "swift-testing test function; tests exercise the full API surface including _unchecked",
+    "Test": "swift-testing test function; tests exercise the full API surface including _unchecked"
 ]
 
 internal final class RawValueTaggedUncheckedVisitor: SyntaxVisitor {
@@ -177,7 +182,7 @@ internal final class RawValueTaggedUncheckedVisitor: SyntaxVisitor {
 
     private static func hasExemptAttribute(_ attributes: AttributeListSyntax) -> Swift.Bool {
         for element in attributes {
-            guard case let .attribute(attribute) = element else { continue }
+            guard case .attribute(let attribute) = element else { continue }
             let name: Swift.String
             if let ident = attribute.attributeName.as(IdentifierTypeSyntax.self) {
                 name = ident.name.text
@@ -195,7 +200,9 @@ internal final class RawValueTaggedUncheckedVisitor: SyntaxVisitor {
 
     /// Domain-narrowing: the rule fires only when the call's callee
     /// identifier is `Tagged` (bare, generic-specialized, or
-    /// member-accessed). Non-Tagged `_unchecked:` call sites are out
+    /// member-accessed).
+    ///
+    /// Non-Tagged `_unchecked:` call sites are out
     /// of scope.
     private static func calleeIsTagged(_ expression: ExprSyntax) -> Bool {
         if let decl = expression.as(DeclReferenceExprSyntax.self) {
