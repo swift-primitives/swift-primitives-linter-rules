@@ -36,6 +36,11 @@ extension Lint.Rule {
         id: "bitpattern rawvalue chain",
         default: .warning,
         findings: { source, severity in
+            // §A brand-owner recognizer: the owner's own `Int(bitPattern:
+            // brand.rawValue)` integration overload ([INFRA-002]) is
+            // legitimate-by-construction. Retires the per-package
+            // `.excluding(rules:)` stopgap ([LINT-EXCLUDE-*]).
+            if Lint.Brand.owned(Lint.Brand.numericBoundaryVocabulary, in: source) { return [] }
             let visitor = RawValueBitPatternVisitor(
                 source: source.file,
                 severity: severity,

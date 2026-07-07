@@ -29,6 +29,11 @@ extension Lint.Rule {
         id: "zero or one literal",
         default: .warning,
         findings: { source, severity in
+            // §A brand-owner recognizer: brand-SPECIFIC to `Cardinal` (the
+            // rule recognises `Cardinal(0)` / `Cardinal(1)` by name), so it
+            // guards only `"Cardinal"` — it keeps firing on a stray
+            // `Cardinal(0)` written inside a different brand owner.
+            if Lint.Brand.owned(["Cardinal"], in: source) { return [] }
             let visitor = CardinalConstructorVisitor(
                 source: source.file,
                 severity: severity,

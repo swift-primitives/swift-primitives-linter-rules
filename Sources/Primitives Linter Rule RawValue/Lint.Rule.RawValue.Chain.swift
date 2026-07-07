@@ -36,6 +36,11 @@ extension Lint.Rule {
         id: "chained rawvalue access",
         default: .warning,
         findings: { source, severity in
+            // §A brand-owner recognizer: same-package `.rawValue.<member>`
+            // chains on the owner's brand are legitimate-by-construction.
+            // Retires the per-package `.excluding(rules:)` stopgap
+            // ([LINT-EXCLUDE-*]).
+            if Lint.Brand.owned(Lint.Brand.numericBoundaryVocabulary, in: source) { return [] }
             let visitor = RawValueChainVisitor(
                 source: source.file,
                 severity: severity,

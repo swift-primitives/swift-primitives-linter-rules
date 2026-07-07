@@ -31,6 +31,39 @@ extension Lint.Rule.`zero or one literal Tests` {
         let parsed = Lint.Source.parsed(from: source, file: file)
         return Lint.Rule.`zero or one literal`.findings(parsed, .warning)
     }
+
+    /// Findings against a run whose brand pre-pass stamped `declaredTypeNames`.
+    static func findings(
+        in source: Swift.String,
+        declaredTypeNames: Swift.Set<Swift.String>
+    ) -> [Diagnostic.Record] {
+        let parsed = Lint.Source.parsed(from: source, declaredTypeNames: declaredTypeNames)
+        return Lint.Rule.`zero or one literal`.findings(parsed, .warning)
+    }
+}
+
+extension Lint.Rule.`zero or one literal Tests`.`Edge Case` {
+    @Test
+    func `Cardinal brand-owner run self-suppresses (§A)`() {
+        // The run declares `Cardinal` — its own `Cardinal(0)` boundary
+        // constructions are legitimate. Zero findings.
+        let findings = Lint.Rule.`zero or one literal Tests`.findings(
+            in: "let c = Cardinal(0)",
+            declaredTypeNames: ["Cardinal"]
+        )
+        #expect(findings.isEmpty)
+    }
+
+    @Test
+    func `a different brand-owner still fires on a stray Cardinal(0) (§A)`() {
+        // This rule is brand-SPECIFIC to `Cardinal`: a run that declares
+        // `Ordinal` (not `Cardinal`) still catches a stray `Cardinal(0)`.
+        let findings = Lint.Rule.`zero or one literal Tests`.findings(
+            in: "let c = Cardinal(0)",
+            declaredTypeNames: ["Ordinal"]
+        )
+        #expect(findings.count == 1)
+    }
 }
 
 extension Lint.Rule.`zero or one literal Tests`.Unit {

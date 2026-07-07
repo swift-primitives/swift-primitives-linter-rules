@@ -38,6 +38,11 @@ extension Lint.Rule {
         id: "tagged extension public init",
         default: .warning,
         findings: { source, severity in
+            // §A brand-owner recognizer: a brand owner's own
+            // `extension Tagged where Tag == <its brand> { public init }`
+            // domain extension is legitimate-by-construction. Retires the
+            // per-package `.excluding(rules:)` stopgap ([LINT-EXCLUDE-*]).
+            if Lint.Brand.owned(Lint.Brand.numericBoundaryVocabulary, in: source) { return [] }
             let visitor = RawValueTaggedExtensionPublicInitVisitor(
                 source: source.file,
                 severity: severity,
