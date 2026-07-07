@@ -48,5 +48,11 @@ extension Lint.Rule.Bundle {
             .enable(.`bitpattern rawvalue chain`),
             .enable(.`chained rawvalue access`),
             .enable(.`tagged extension public init`),
+            // [CONV-015] — promoted 2026-07-07 (principal ruling, option a)
+            // from swift-tagged-primitives' nested Lint/ PoC
+            // (Lint.Rule.TaggedDomainAudit); map/retag/@Test exemptions
+            // preserved. Receipt:
+            // Research/promote-tagged-unchecked-validation-2026-07-07.md.
+            .enable(.`tagged unchecked with typed alternative`),
         ]
 }
