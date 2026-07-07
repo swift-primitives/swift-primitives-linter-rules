@@ -76,11 +76,15 @@ internal final class CarrierColumnBoundVisitor: SyntaxVisitor {
     let converter: SourceLocationConverter
     var matches: [Diagnostic.Record] = []
 
-    /// The storage/column axis parameter name. The whole tower uses `S` for the
+    /// The storage/column axis parameter name.
+    ///
+    /// The whole tower uses `S` for the
     /// column; `Element`, `Key`, `n`, `N` are NOT storage axes.
     private static let storageAxis: Swift.String = "S"
 
-    /// The ADT-family namespace roots ([DS-026]'s CARRIER scope). Deliberately
+    /// The ADT-family namespace roots ([DS-026]'s CARRIER scope).
+    ///
+    /// Deliberately
     /// EXCLUDES the storage substrates (`Storage`, `Store`, `Buffer`, `Shared`,
     /// `Column`): a substrate legitimately carries capability bounds; only the
     /// ADT CARRIERS are subject to the bound-off-the-type predicate. Hoisted
@@ -193,7 +197,9 @@ internal final class CarrierColumnBoundVisitor: SyntaxVisitor {
     /// The OUTERMOST namespace component the struct lives under: the extended
     /// type's base identifier for extension-declared nests, the outermost
     /// nominal's name for lexically-nested decls, or the struct's own name at
-    /// top level. (Mirrors `FrozenTowerTypeVisitor.rootNamespace`.)
+    /// top level.
+    ///
+    /// Mirrors `FrozenTowerTypeVisitor.rootNamespace`.
     private func rootNamespace(of node: StructDeclSyntax) -> Swift.String? {
         var outermost: Swift.String? = node.name.text
         var current: Syntax? = node.parent
